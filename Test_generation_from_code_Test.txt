@@ -1,0 +1,968 @@
+Attribute VB_Name = "Test_generation_from_code_Test"
+Option Explicit
+
+Option Private Module
+
+'@TestModule
+'@Folder("Tests")
+
+Private Assert As Object
+Private Fakes  As Object
+
+'@ModuleInitialize
+Public Sub ModuleInitialize()
+'this method runs once per module.
+    Set Assert = CreateObject("Rubberduck.AssertClass")
+    Set Fakes = CreateObject("Rubberduck.FakesProvider")
+End Sub
+
+'@ModuleCleanup
+Public Sub ModuleCleanup()
+'this method runs once per module.
+    Set Assert = Nothing
+    Set Fakes = Nothing
+End Sub
+
+'@TestInitialize
+Public Sub TestInitialize()
+'this method runs before every test in the module.
+End Sub
+
+'@TestCleanup
+Public Sub TestCleanup()
+'this method runs after every test in the module.
+    Module_Test_code_Global = vbNullString
+    Module_Test_code = vbNullString
+End Sub
+
+'@TestMethod
+Public Sub Split_by_vbrclf_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str As String, d1 As Variant
+    str = "Public Function С01(d1() As Variant, _" & vbCrLf & _
+          "ByVal str As String) _" & vbCrLf & _
+          "As String   "
+
+    d1 = Split_by_vbrclf(str)
+
+    If UBound(d1) <> (2 + Option_Base) Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Array_Comments_delete_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str    As String
+    str = "'omment" & vbCrLf & _
+          "C'omment" & vbCrLf & _
+          "Co'mment"
+    Dim d1 As Variant, d2 As Variant
+    d1 = Split(str, vbCrLf)
+
+    d2 = Array_Comments_delete(d1)
+
+    Dim d1_Found As Variant
+    d1_Found = Array_Find_Row_Col(d1, "'")
+
+    If d1_Found(LBound(d1_Found)) <> Empty Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Array_Find_Row_Col_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str    As Variant
+    str = "Public Function С01(d1() As Variant, _" & vbCrLf & _
+          "ByVal str As String) _" & vbCrLf & _
+          "As String   "
+    Dim d1     As Variant
+    d1 = Split(str, vbLf)
+
+    d1 = Array_Find_Row_Col(d1, "'")
+
+    If d1(1) <> Empty Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+    str = "Public Function С01(d1() As Variant, _" & vbCrLf & _
+          "ByVal str As String) _" & vbCrLf & _
+          "As String" & "'"
+    d1 = Split(str, vbLf)
+
+    d1 = Array_Find_Row_Col(d1, "'")
+
+    If d1(1) = Empty Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Underscore_replace_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str    As String
+    str = "Public Function С01(d1() As Variant, _" & vbCrLf & _
+          "ByVal str As String) _" & vbCrLf & _
+          "As String   "
+
+    str = Underscore_replace(str)
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Paste_from_clipboard_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Paste_from_clipboard
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Apostrophe_Position_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str    As String: str = "123'"
+
+    Dim place  As Long
+
+    place = Apostrophe_Position(str)
+
+    If place <> 4 Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Part_Left_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str    As String: str = "123'"
+
+    str = Part_Left(str, 4)
+
+    If Len(str) <> 3 Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Like_Proc_Declare_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str    As String
+
+    str = "Public Sub Like_Proc_Declare_TestMethod1() "
+
+    If Like_Proc_Declare(str) = False Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Proc_Name_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str    As String
+    str = "Public Sub Proc_Name()"
+    str = Proc_Name(str)
+    If str <> "Proc_Name" Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Proc_Declare_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Module_Test_code = "'InExSu" & vbCrLf
+
+    Proc_Declare "Name_New"
+
+    If Module_Test_code <> _
+       "'InExSu" & vbCrLf & _
+       "Public Sub Name_New_TestMethod()" Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Proc_Top_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str01 As String, str02 As String
+    str01 = "'InExSu" & vbCrLf
+
+    Module_Test_code = str01
+
+    Proc_Top
+
+    str02 = vbCrLf & _
+            "On Error GoTo TestFail" & vbCrLf & _
+            "bDebug = True" & vbCrLf & _
+            "Settings"
+
+    If Module_Test_code <> str01 & str02 Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Code_String_first_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim code   As String
+    code = "'Public Sub Code_String_first_TestMethod1()"
+
+    Module_Test_code = code & _
+                       vbCrLf & "String 2nd"
+
+    Dim str    As String
+    str = Code_String_first
+
+    If str <> code Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Args_String_TestMethod1()
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str    As String
+    str = "(ByVal str As String)"
+
+    str = Args_String(str)
+
+    If str <> "ByVal str As String" Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Array_As_TestMethod1()
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str    As String
+    str = "ByVal str As String"
+
+    Dim d1     As Variant
+    d1 = Array_As(str)
+
+    If d1(LBound(d1) + 2) <> "As" Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Comma_wo_As_to_Variant_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str    As String
+    str = "a1, a2"
+
+    str = Comma_wo_As_to_Variant(str)
+
+    If str <> "a1 As Variant, a2 As Variant" Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Arg_is_One_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str    As String
+    str = "z"
+    str = Arg_is_One(str)
+    If str <> "z As Variant" Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Code_Add_Var_Declare_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str    As String
+    str = "ByVal str As String"
+
+    Code_Add_Var_Declare _
+            Array_As(str)
+    'можно бы и проверить, но лень ...
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub String_Proc_Call_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Module_Test_code = Code_Example
+
+    Dim str As String, sVar As String
+    sVar = "var_01, var_02"
+
+    str = String_Proc_Call(sVar)
+
+    If str <> "f01 " & sVar Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub String_Args_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Module_Test_code = Code_Example_w_Vars
+
+    Dim str    As String
+
+    str = String_Args
+
+    If str <> "var_0 ,var_1" Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Symb_Right_Cut_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str As String, symb As String
+    symb = ","
+    str = " " & symb
+    str = Symb_Right_Cut(str, symb)
+    If InStr(str, symb) > 0 Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Proc_Call_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str    As String
+    str = "z"
+    Proc_Call str
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Proc_Bottom_TestMethod1()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Module_Test_code = "Sub qwe("
+
+    Proc_Bottom
+
+    If InStr(Module_Test_code, " Function") > 0 Then _
+       Err.Raise 567, "Proc_Bottom", vbNullString
+    If InStr(Module_Test_code, "End Sub") = 0 Then _
+       Err.Raise 567, "Proc_Bottom", "End Sub = 0"
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Code_Local_2_Global_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Module_Test_code_Global = "z"
+    Module_Test_code = "y"
+
+    Code_Local_2_Global
+
+    If Module_Test_code_Global <> "z" & vbCrLf & "y" Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Var_Name_from_Declare_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim str    As String
+
+    str = "Dim str As String"
+    str = Var_Name_from_Declare(str)
+
+    If str <> "str" Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+    str = "Dim str String"
+    str = Var_Name_from_Declare(str)
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Code_All_2_Units_Tests_TestMethod1()
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Text_2_Clipboard "Public Function Brackets(d1() As Variant) _" & vbCrLf & _
+                       "As Variant()"    ' Тестом покрыта
+    
+Code_All_2_Units_Tests
+TestExit:
+Exit Sub
+TestFail:
+Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub Comments_delete_TestMethod1()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim str    As String
+    str = "z'z"
+
+    str = Comments_delete(str)
+
+    If str <> "z" Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+    str = "z" & vbCrLf & "'z"
+
+    str = Comments_delete(str)
+
+    If str <> "z" & vbCrLf Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'===
+
+'@TestMethod
+''Public Function in_Quotes_remove(ByVal str As String)        As Variant
+Public Sub in_Quotes_remove_TestMethod()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim var_0  As String
+    var_0 = "1" & Chr(34) & "2" & Chr(34) & "3"
+    Dim str    As String
+
+    str = in_Quotes_remove(var_0)
+    If str <> "13" Then _
+       Err.Raise 567, "", ""
+
+    var_0 = "1" & Chr(34) & "2" & Chr(34) & "2" & Chr(34) & "2" & Chr(34) & "3"
+
+    str = in_Quotes_remove(var_0)
+    If str <> "123" Then _
+       Err.Raise 567, "", ""
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+''Public Function Symb_Pair_Remove(ByVal str As String,                                  ByVal symb As String)                                  As String
+Public Sub Symb_Pair_Remove_TestMethod()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String
+    Dim var_1  As String
+
+    Symb_Pair_Remove var_0, var_1
+
+    var_0 = "11'33'"
+    var_1 = "'"
+    Dim str    As String
+
+    str = Symb_Pair_Remove(var_0, var_1)
+
+    If str <> "11" Then _
+       Err.Raise 567, "", ""
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+'@TestMethod
+''Public Function Position_01(ByVal str As String,                             ByVal symb As String)                             As String_Cut
+Public Sub Position_01_TestMethod()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String
+    Dim var_1  As String
+
+    Position_01 var_0, var_1
+
+    var_0 = "1234567890"
+    var_1 = "5"
+    Dim iPos   As Long
+
+    iPos = Position_01(var_0, var_1).Position_01
+
+    If iPos <> 5 Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+'@TestMethod
+''Public Function Position_02(d1 As String_Cut)        As String_Cut
+Public Sub Position_02_TestMethod()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+
+    Dim var_0  As String_Cut
+    var_0.str = "12''567890"
+    var_0.symb = "'"
+    var_0.Position_01 = 3
+    var_0.Position_02 = 4
+    Dim iCount As Long
+
+    iCount = Position_02(var_0).Position_02
+
+    If iCount <> 4 Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+''Public Function Cut_BeTween(d1SC As String_Cut)        As String     ' Тестом НЕ покрыта
+Public Sub Cut_BeTween_TestMethod()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String_Cut
+    var_0.str = "1234567890"
+    var_0.symb = "'"
+    var_0.Position_01 = 3
+    var_0.Position_02 = 6
+    Dim str    As String
+
+    str = Cut_BeTween(var_0)
+
+    If str <> "127890" Then _
+       Err.Raise 567, "", ""
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+''Public Function Cut_Edges(d1 As String_Cut)        As String
+Public Sub Cut_Edges_TestMethod()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String_Cut
+    With var_0
+        .str = "1234567890"
+        .Position_01 = 3
+        .Position_02 = 3
+        '.symb = empty
+
+        Dim str As String
+
+        str = Cut_Edges(var_0)
+
+        If str <> "4567" Then _
+           Err.Raise 567, vbNullString, vbNullString
+    End With
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+'@TestMethod
+''Public Function Cut_Left(ByVal str As String, ByVal iPos As Long)        As String
+Public Sub Cut_Left_TestMethod()        ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String
+    Dim var_1  As Long
+
+    Cut_Left var_0, var_1
+
+
+    var_0 = "1234567890"
+    var_1 = 3
+    Dim str    As String
+
+    str = Cut_Left(var_0, var_1)
+
+    If str <> "4567890" Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+'@TestMethod
+''Public Function Cut_Right(ByVal str As String, ByVal iPos As Long)        As String
+Public Sub Cut_Right_TestMethod()        'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String
+    Dim var_1  As Long
+
+    Cut_Right var_0, var_1
+
+    var_0 = "1234567890"
+    var_1 = 3
+    Dim str    As String
+
+    str = Cut_Right(var_0, var_1)
+
+    If str <> "1234567" Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+' InExSu 03.12.2018 18:58
+
+
+'@TestMethod
+''Public Function Side_Left(ByVal str As String, ByVal iPos As Long)        As Variant    ' Oanoii IA iie?uoa
+Public Sub Side_Left_TestMethod()
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String
+    Dim var_1  As Long
+    Side_Left var_0, var_1
+
+    var_0 = "1234567890"
+    var_1 = 5
+
+    Dim str    As String
+
+    str = Side_Left(var_0, var_1)
+
+    If str <> "12345" Then _
+       Err.Raise 567, vbNullString, vbNullString
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+'@TestMethod
+''Public Function Side_Right(ByVal str As String, ByVal iPos As Long)        As Variant    ' Oanoii IA iie?uoa
+Public Sub Side_Right_TestMethod()    ' ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String
+    Dim var_1  As Long
+
+    Side_Right var_0, var_1
+
+    var_0 = "1234567890"
+    var_1 = 3
+
+    Dim str    As String
+    str = Side_Right(var_0, var_1)
+
+    If str <> "890" Then _
+       Err.Raise 567, vbNullString, vbNullString
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+Public Sub String_2_Array_TestMethod()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String
+    Dim var_1  As String
+    Dim d1     As Variant
+
+    String_2_Array var_0, var_1
+
+    var_0 = "1"
+    String_2_Array var_0, var_1
+
+    var_0 = "1 1"
+    var_1 = " "
+
+    d1 = String_2_Array(var_0, var_1)
+
+    If d1(1) <> "1" Then _
+       Err.Raise 567, "", ""
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+'@TestMethod
+
+Public Sub Array_2_String_TestMethod()
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As Variant
+    Dim var_1  As String
+
+    Array_2_String var_0, var_1
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+
+Public Sub Array_Variant_Brackets_reArrange_TestMethod()    ' ok
+'On Error GoTo TestFail
+'нужно доработать
+    bDebug = True
+    Settings
+    Dim var_0  As Variant
+    var_0 = Split("1 1")
+    Dim d1     As Variant
+
+    d1 = Array_Variant_Brackets_reArrange(var_0)
+
+    If d1(1) <> 1 Then _
+       Err.Raise 567, "", ""
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Variant_Brackets_reArrange_TestMethod()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As String
+    Dim str    As String
+
+    var_0 = "() As Variant"
+    str = Variant_Brackets_reArrange(var_0)
+
+    If str <> "As Variant()" Then _
+       Err.Raise 567, "", ""
+
+    var_0 = "() AS vAriant"
+    str = Variant_Brackets_reArrange(var_0)
+
+    If str <> "As Variant()" Then _
+       Err.Raise 567, "", ""
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub Code_Comments_Delete_TestMethod()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As Variant
+    Module_Test_code = "Com'ment"
+
+    Code_Comments_Delete var_0
+
+    If Module_Test_code <> "Com" Then _
+       Err.Raise 567, "", ""
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub RubberDuck_Sign_TestMethod()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As Variant
+
+    RubberDuck_Sign var_0
+
+    If InStr(Module_Test_code, "'@TestMethod") < 1 Then _
+       Err.Raise 567, "", ""
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
+
+
+'@TestMethod
+Public Sub to_ClipBoard_TestMethod()    'ok
+    On Error GoTo TestFail
+    bDebug = True
+    Settings
+    Dim var_0  As Variant
+
+    to_ClipBoard var_0
+
+TestExit:
+    Exit Sub
+TestFail:
+    Assert.Fail "Test error: #" & Err.Number & " - " & Err.Description
+End Sub
