@@ -1,0 +1,239 @@
+Attribute VB_Name = "Utils"
+Option Explicit
+
+Public Function GitHub(Optional ByVal wb As Workbook)
+'VB_Components_Export
+' Тестом НЕ покрыто
+    If wb Is Nothing Then _
+       Set wb = ActiveWorkbook
+
+    Dim iTempPath As String, iType As String
+
+    iTempPath = Каталог(wb.Path & "\GitHub\")    'укажите свою папку
+
+    Dim iVBComponent As Object
+
+    For Each iVBComponent In wb.VBProject.VBComponents
+
+        Select Case iVBComponent.Type
+        Case 1: iType = ".txt"
+        Case 3: iType = ".frm"
+        Case 2, 100: iType = ".cls"
+        End Select
+
+        iVBComponent.Export _
+                Filename:=iTempPath & iVBComponent.Name & iType
+    Next
+End Function
+
+Public Function Каталог(ByVal Путь As String) As String
+    On Error Resume Next
+    MkDir Путь
+    Каталог = Путь
+End Function
+
+Public Function Путь(ByVal подКаталог As String) As String
+    If подКаталог = vbNullString Then подКаталог = "Версии"
+    Путь = ThisWorkbook.Path & "\" & подКаталог & "\"
+End Function
+
+Public Function Расширение_без_Имени(ByVal str As String) As String
+'Возвращает имя файла без расширения
+    Dim iPos   As Long
+    iPos = Len(str) - InStrRev(str, ".")
+    Расширение_без_Имени = Right$(str, iPos)
+End Function
+
+Public Function Имя_без_Расширения(ByVal str As String) As String
+' Возвращает расширение без имени файла
+    Dim iPos   As Long
+    iPos = InStr(str, ".") - 1
+    Имя_без_Расширения = Left$(str, iPos)
+End Function
+
+Public Function КонфиденцПесонал(ByVal ON_oFF As String, _
+                                 ByVal msg As Boolean) As Variant
+'персональные
+    On Error Resume Next
+
+    Dim Status As String
+
+    With ActiveWorkbook
+
+        If ON_oFF = "oFF" Then
+            .RemovePersonalInformation = False
+            Status = "отКлючено"
+        End If
+
+        If ON_oFF = "ON" Then
+            .RemovePersonalInformation = True
+            Status = "ВКлючено"
+        End If
+
+        If msg Then _
+           MsgBox "Предупреждение О Конфиденциальной Информации", _
+           vbOKOnly, _
+           Status
+    End With
+End Function
+
+Sub RefStyle_Сhange()    'сменить адресацию ячеек
+    With Application
+        .ReferenceStyle = IIf(.ReferenceStyle = xlA1, _
+                              xlR1C1, _
+                              xlA1)
+    End With
+    'Горячая клавиша = добавить в
+    'Private Sub Workbook_Open()
+    '    Application.OnKey "^+{R}", "RefStyle_Сhange"
+End Sub
+
+Public Function Символы_Удалить(d1() As Variant, _
+                                ByVal str As String) _
+                                As String    ' Тестом НЕ покрыта
+
+    Dim x      As Long
+
+    For x = LBound(d1) To UBound(d1)
+
+        str = Replace(str, d1(x), vbNullString)
+
+    Next
+
+    Символы_Удалить = str
+
+End Function
+
+Public Function Символы_Заменить(d1() As Variant, _
+                                 ByVal str As String, sWhat) _
+                                 As String    ' Тестом НЕ покрыта
+' строка символы заменить по массиву на один символ
+    Dim x      As Long
+
+    For x = LBound(d1) To UBound(d1)
+
+        Replace str, d1(x), sWhat
+
+    Next
+
+    Символы_Заменить = str
+
+End Function
+
+Public Function Option_Base(Optional ByVal msg As Variant) _
+       As Long    ' тестом Покрыто опосредованно
+    Dim arr_1d As Variant
+    arr_1d = Array(vbNullString)
+
+    Option_Base = LBound(arr_1d)
+End Function
+
+Public Function Array_Find_Row_Col(dX As Variant, str As String) _
+       As Variant    ' Тестом покрыта
+' find the value in the array and return
+' the row and column numbers
+' if no value is found, then the cells of the array
+' will be empty, not zeros
+    Dim arr_Dim As Long: arr_Dim = Array_Dimension(dX)
+    If arr_Dim > 2 Then _
+       Exit Function
+    Dim d1_Row_Col(1 To 2) As Variant
+    If arr_Dim = 1 Then
+        Dim x  As Long
+        For x = LBound(dX) To UBound(dX)
+            If InStr(dX(x), str) > 0 Then
+                d1_Row_Col(1) = x    ' row
+                d1_Row_Col(2) = 1    ' column
+            End If
+        Next
+    End If
+    If arr_Dim = 2 Then
+        Dim y  As Long
+        For y = LBound(dX) To UBound(dX)
+            For x = LBound(dX, 2) To UBound(dX, 2)
+                If InStr(dX(y, x), str) > 0 Then
+                    d1_Row_Col(1) = y    ' row
+                    d1_Row_Col(2) = x    ' column
+                End If
+            Next
+        Next
+    End If
+    Array_Find_Row_Col = d1_Row_Col
+End Function
+
+Private Sub REName_(Optional ByVal msg As Variant)
+    Dim d2_Row_Col(0 To 2, 0 To 2) As Variant
+End Sub
+
+Public Function Array_Dimension(arr As Variant) As Long   'возвращает количество измерений массива Arr
+    Dim i As Long, x As Long    ' тестом Покрыто опосредованно
+    On Error GoTo eXX
+    Err.Clear: On Error Resume Next
+    ' increase until get an error trying
+    ' to get UBound on this dimension
+    Do: i = i + 1
+        x = UBound(arr, i)
+        If Err.Number > 0 Then Exit Do
+    Loop
+eXX:
+    Array_Dimension = i - 1
+End Function
+
+Public Function Clipboard_2_Text() As String    ' чтение из буфера обмена
+' On Error Resume Next
+'    With GetObject("New:{1C3B4210-F441-11CE-B9EA-00AA006B1A69}")
+'        .GetFromClipboard
+'        Clipboard_2_Text = .GetText
+'    End With
+    Dim clipboard As MSForms.DataObject
+    Set clipboard = New MSForms.DataObject
+    'Application.Wait Now + TimeValue("0:00:01")
+    Application.Wait (Now + 0.000006)    ' для обхода ClipDairy
+    clipboard.GetFromClipboard
+    Clipboard_2_Text = clipboard.GetText
+End Function
+
+Private Sub iTimer(Optional ByVal msg As Variant)
+    Dim dt1    As Double
+    dt1 = Timer
+    Application.Wait (Now + 0.000006)
+    Debug.Print Timer - dt1
+End Sub
+
+Public Sub Text_2_Clipboard(ByVal txt As String)    ' запись в буфер обмена
+'     On Error Resume Next
+    If txt <> Empty Then
+        With GetObject("New:{1C3B4210-F441-11CE-B9EA-00AA006B1A69}")
+            .SetText txt$
+            .PutInClipboard
+        End With
+    End If
+End Sub
+
+Public Function extract_Between(ByVal txt As Variant, _
+                                ByVal sLeft As String, _
+                                ByVal sRight As String) As String
+'извлечь между
+    If Len(txt) > 0 And Len(sLeft) > 0 And Len(sRight) > 0 And _
+       InStr(txt, sLeft) > 0 And InStr(txt, sRight) > 0 Then
+        Dim s     'без типа для Split
+        s = Split(txt, sLeft)
+        s = Split(s(1), sRight)
+        extract_Between = s(0)
+    Else
+        'обработка ошибки
+        ' Err.Raise 567, "extract_Between", "Ошибка"
+    End If
+End Function
+
+Public Function Symb_Right_Cut(ByVal str As String, _
+                               ByVal symb As String) _
+                               As Variant
+' тестом Покрыто
+'  справа удалить символ, если он
+    If Right$(str, 1) = symb Then
+        Symb_Right_Cut = Left$(str, Len(str) - 1)
+    Else
+        Symb_Right_Cut = str
+    End If
+End Function

@@ -1,0 +1,35 @@
+Attribute VB_Name = "RibbonCallbacks"
+Option Explicit    'Потребовать явного объявления всех переменных в файле
+
+'btn_01 (компонент: button, атрибут: onAction), 2007
+Sub Ribbon_БуферОбмена_в_Матрёшку_c_Функциями(control As IRibbonControl)
+    БуферОбмена_в_Матрёшку_c_Функциями
+End Sub
+
+'btn_02 (компонент: button, атрибут: onAction), 2007
+Sub Ribbon_Юнит_Тест_Шаблон_из_Строки(control As IRibbonControl)
+    Юнит_Тесты_Шаблоны_из_Буфера
+End Sub
+
+'btn_03 (компонент: button, атрибут: onAction), 2007
+Sub Ribbon_GitHUb(control As IRibbonControl)
+    GitHub
+End Sub
+
+Sub Ribbon_КонфиденцПесонал(control As IRibbonControl)
+    КонфиденцПесонал "oFF", True    ' с оповещением
+End Sub
+
+Sub Ribbon_Юнит_Тесты_для_Кода_в_Буфере(control As IRibbonControl)
+    Юнит_Тесты_для_Кода_в_Буфере
+End Sub
+
+'btn_Цикл_d_Имя_Функции (компонент: button, атрибут: onAction), 2007
+Sub Ribbon_Строку_Цикла_в_Имя_Функции(control As IRibbonControl)
+    Строку_Цикла_в_Имя_Функции , True
+End Sub
+
+'btn_Code_All (компонент: button, атрибут: onAction), 2007
+Sub Ribbon_Code_All_2_Units_Tests(control As IRibbonControl)
+    Code_All_2_Units_Tests
+End Sub
